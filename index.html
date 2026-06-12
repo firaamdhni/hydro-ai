@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2f7d4a" />
+  <title>PlantCare AI - Analisis Tanaman</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <span class="eyebrow">AI PAKAR TANAMAN</span>
+        <h1>PlantCare AI</h1>
+      </div>
+      <button id="historyBtn" class="icon-btn" aria-label="Buka riwayat">Riwayat</button>
+    </header>
+
+    <main>
+      <section id="cameraSection" class="section active">
+        <div class="intro-card">
+          <div class="intro-icon">🌿</div>
+          <div>
+            <h2>Periksa kondisi tanaman</h2>
+            <p>Arahkan kamera ke daun yang bermasalah. Pastikan gambar terang, fokus, dan memenuhi bingkai.</p>
+          </div>
+        </div>
+
+        <div class="camera-card">
+          <div id="cameraStage" class="camera-stage">
+            <video id="cameraVideo" autoplay playsinline muted></video>
+            <img id="previewImage" alt="Pratinjau tanaman" hidden />
+            <canvas id="captureCanvas" hidden></canvas>
+
+            <div id="cameraPlaceholder" class="camera-placeholder">
+              <div class="leaf-mark">🍃</div>
+              <strong>Kamera belum aktif</strong>
+              <span>Tekan tombol “Buka Kamera”</span>
+            </div>
+
+            <div class="focus-frame" aria-hidden="true"></div>
+          </div>
+
+          <p id="cameraMessage" class="message" role="status">
+            Kamera membutuhkan izin dari browser.
+          </p>
+
+          <div class="button-grid">
+            <button id="startCameraBtn" class="btn btn-primary">Buka Kamera</button>
+            <button id="captureBtn" class="btn btn-primary" disabled>Ambil Gambar</button>
+            <label class="btn btn-secondary upload-btn">
+              Pilih dari Galeri
+              <input id="imageInput" type="file" accept="image/*" capture="environment" />
+            </label>
+            <button id="retakeBtn" class="btn btn-secondary" hidden>Ambil Ulang</button>
+          </div>
+
+          <button id="continueBtn" class="btn btn-accent btn-full" disabled>
+            Lanjutkan Analisis
+          </button>
+        </div>
+
+        <div class="tips-card">
+          <h3>Agar hasil lebih baik</h3>
+          <div class="tips-grid">
+            <div><span>☀️</span><p>Gunakan pencahayaan cukup</p></div>
+            <div><span>🎯</span><p>Fokus pada satu daun</p></div>
+            <div><span>🧼</span><p>Hindari lensa yang kotor</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="questionSection" class="section">
+        <div class="section-heading">
+          <button class="back-btn" data-back="cameraSection">←</button>
+          <div>
+            <span class="eyebrow">LANGKAH 2</span>
+            <h2>Tambahkan gejala</h2>
+          </div>
+        </div>
+
+        <div class="image-summary">
+          <img id="questionPreview" alt="Foto tanaman yang dianalisis" />
+          <div>
+            <strong>Foto berhasil disiapkan</strong>
+            <p>Pilih gejala yang paling sesuai dengan kondisi tanaman.</p>
+          </div>
+        </div>
+
+        <form id="symptomForm" class="form-card">
+          <fieldset>
+            <legend>Warna daun</legend>
+            <label class="option"><input type="radio" name="leafColor" value="hijau" checked /><span>Dominan hijau</span></label>
+            <label class="option"><input type="radio" name="leafColor" value="kuning" /><span>Menguning atau pucat</span></label>
+            <label class="option"><input type="radio" name="leafColor" value="cokelat" /><span>Ada bagian cokelat</span></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Kondisi permukaan</legend>
+            <label class="option"><input type="checkbox" name="symptoms" value="bercak" /><span>Terdapat bercak</span></label>
+            <label class="option"><input type="checkbox" name="symptoms" value="berlubang" /><span>Daun berlubang</span></label>
+            <label class="option"><input type="checkbox" name="symptoms" value="layu" /><span>Daun terlihat layu</span></label>
+            <label class="option"><input type="checkbox" name="symptoms" value="menggulung" /><span>Daun menggulung</span></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Kondisi tambahan</legend>
+            <label class="option"><input type="checkbox" name="symptoms" value="akar-cokelat" /><span>Akar berwarna cokelat atau berlendir</span></label>
+            <label class="option"><input type="checkbox" name="symptoms" value="air-keruh" /><span>Air atau media terlalu lembap</span></label>
+            <label class="option"><input type="checkbox" name="symptoms" value="hama" /><span>Terlihat serangga atau telur hama</span></label>
+          </fieldset>
+
+          <button type="submit" class="btn btn-accent btn-full">Analisis Sekarang</button>
+        </form>
+      </section>
+
+      <section id="loadingSection" class="section loading-section">
+        <div class="loader"></div>
+        <h2>Menganalisis tanaman...</h2>
+        <p>Membaca warna gambar dan mencocokkan gejala dengan basis pengetahuan.</p>
+      </section>
+
+      <section id="resultSection" class="section">
+        <div class="section-heading">
+          <button class="back-btn" data-back="cameraSection">×</button>
+          <div>
+            <span class="eyebrow">HASIL ANALISIS</span>
+            <h2>Diagnosis awal tanaman</h2>
+          </div>
+        </div>
+
+        <div class="result-image-card">
+          <img id="resultPreview" alt="Foto hasil analisis" />
+          <div id="statusBadge" class="status-badge">Memuat</div>
+        </div>
+
+        <div class="result-card primary-result">
+          <span class="small-label">Kemungkinan kondisi</span>
+          <h2 id="diagnosisTitle">-</h2>
+          <div class="confidence-row">
+            <span>Tingkat kecocokan</span>
+            <strong id="confidenceText">0%</strong>
+          </div>
+          <div class="confidence-track">
+            <div id="confidenceBar" class="confidence-bar"></div>
+          </div>
+          <p id="diagnosisDescription"></p>
+        </div>
+
+        <div class="result-card">
+          <h3>Gejala yang mendukung</h3>
+          <ul id="matchedSymptoms" class="result-list"></ul>
+        </div>
+
+        <div class="result-card">
+          <h3>Kemungkinan penyebab</h3>
+          <ul id="causeList" class="result-list"></ul>
+        </div>
+
+        <div class="result-card recommendation-card">
+          <h3>Rekomendasi penanganan</h3>
+          <ol id="recommendationList" class="result-list numbered"></ol>
+        </div>
+
+        <div class="warning-card">
+          <strong>Catatan penting</strong>
+          <p>Hasil ini adalah diagnosis awal, bukan pengganti pemeriksaan ahli pertanian. Beberapa penyakit memiliki gejala visual yang mirip.</p>
+        </div>
+
+        <div class="button-grid result-actions">
+          <button id="saveResultBtn" class="btn btn-primary">Simpan Hasil</button>
+          <button id="restartBtn" class="btn btn-secondary">Analisis Lagi</button>
+        </div>
+      </section>
+
+      <section id="historySection" class="section">
+        <div class="section-heading">
+          <button class="back-btn" data-back="cameraSection">←</button>
+          <div>
+            <span class="eyebrow">RIWAYAT LOKAL</span>
+            <h2>Hasil sebelumnya</h2>
+          </div>
+        </div>
+        <div id="historyList" class="history-list"></div>
+        <button id="clearHistoryBtn" class="btn btn-danger btn-full">Hapus Semua Riwayat</button>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/diagnosis-engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
